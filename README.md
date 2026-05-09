@@ -1,6 +1,6 @@
 # Python-Based Mail Merge
 
-Genesis: As it happened, I couldn't access Office 365 due to a lack of institutional support for Office 365. Then, as it happened, I had to do a mail-merge (which I hadn't done in years). Tried to walk through LibreOffice, but couldn't get it to work on Mac (most likely user error) to send emails. So whipped up this little thing to send emails using Python+Jinja.
+Genesis: I couldn't access Office 365 due to a lack of institutional support for Office 365. Then, as it happened, I had to do a mail-merge (which I hadn't done in years). Tried to walk through LibreOffice, but couldn't get it to work on Mac (most likely user error) to send emails. So whipped up this little thing to send emails using Python+Jinja.
 
 This setup sends a simple Markdown-based mail merge from `contact-list.xlsx`
 through Gmail SMTP using a Google app password.
