@@ -17,3 +17,4 @@ contacts.csv
 
 # Markdowns
 *.md
+!README.md
