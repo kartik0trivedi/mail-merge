@@ -19,7 +19,7 @@ __pycache__/
 !contact-list.xlsx
 *.ods
 !contact-list.ods
-
+*.html
 # Markdowns
 *.md
 !README.md
