@@ -13,7 +13,12 @@ __pycache__/
 .DS_Store
 
 # files
-contacts.csv
+*.csv
+!contact-list.csv
+*.xlsx
+!contact-list.xlsx
+*.ods
+!contact-list.ods
 
 # Markdowns
 *.md
