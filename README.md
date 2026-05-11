@@ -1,6 +1,8 @@
 # Python-Based Mail Merge
 
-Genesis: I couldn't access Office 365 due to a lack of institutional support for Office 365. Then, as it happened, I had to do a mail-merge (which I hadn't done in years). Tried to walk through LibreOffice, but couldn't get it to work on Mac (most likely user error) to send emails. So whipped up this little thing to send emails using Python+Jinja.
+Genesis: I couldn't access Office 365 due to a lack of institutional support.
+Then I had to do a mail-merge and couldn't get LibreOffice working on Mac. So
+whipped up this little thing to send emails using Python.
 
 This setup sends a simple Markdown-based mail merge from `contact-list.xlsx`
 through Gmail SMTP using a Google app password.
@@ -45,7 +47,10 @@ Copy `.env.example` to `.env` and fill in your Gmail SMTP details.
 cp .env.example .env
 ```
 
-For Gmail, enable 2-Step Verification on the sending Google account, then create an app password from your Google Account security settings. Use that 16-character app password as `SMTP_PASSWORD`. Do not use your normal Google account password. I didn't test it on Outlook or any other provider. Could work. Or you can use this code and vibe it out.
+For Gmail, enable 2-Step Verification on the sending account, then create an
+app password from your Google Account security settings. Use that 16-character
+app password as `SMTP_PASSWORD` — not your normal Google password. Untested on
+Outlook or other providers, but may work.
 
 ## Scaffold a new template
 
@@ -98,14 +103,11 @@ python mail_merge.py --contacts contact-list.ods --preview
 
 ## Send
 
-Load the environment variables, then send:
-
 ```bash
-set -a
-source .env
-set +a
 python mail_merge.py --send
 ```
+
+The script loads `.env` automatically.
 
 Start with a limited send first:
 
@@ -113,7 +115,8 @@ Start with a limited send first:
 python mail_merge.py --send --limit 1
 ```
 
-By default, the script waits 3 seconds between sent emails. You can change that with `--delay`:
+By default, the script waits 3 seconds between sent emails. Change it with
+`--delay`:
 
 ```bash
 python mail_merge.py --send --delay 5

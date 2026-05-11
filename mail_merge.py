@@ -15,7 +15,10 @@ from email.message import EmailMessage
 from pathlib import Path
 from typing import Iterable
 
+from dotenv import load_dotenv
 from openpyxl import load_workbook
+
+load_dotenv()
 
 
 REQUIRED_COLUMNS = ("Email",)
@@ -371,6 +374,12 @@ def preview(
     print(body, end="" if body.endswith("\n") else "\n")
 
 
+def md_to_html(text: str) -> str:
+    import markdown
+    body_html = markdown.markdown(text, extensions=["nl2br"])
+    return f"<html><body>{body_html}</body></html>"
+
+
 def send_email(
     contact: Contact,
     subject: str,
@@ -395,6 +404,7 @@ def send_email(
         message["Bcc"] = ", ".join(bcc)
     message["Subject"] = subject
     message.set_content(body)
+    message.add_alternative(md_to_html(body), subtype="html")
 
     with smtplib.SMTP(host, port) as smtp:
         if os.getenv("SMTP_STARTTLS", "true").lower() not in {"0", "false", "no"}:
