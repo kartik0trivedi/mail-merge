@@ -54,28 +54,43 @@ Outlook or other providers, but may work.
 
 ## Scaffold a new template
 
-Generate a starter template pre-filled with placeholders drawn from a contact file:
+`--template` with **no filename** triggers scaffold mode — it reads the column
+headers from the contact file and writes a starter `.md` file:
 
 ```bash
 python mail_merge.py --template --contacts contacts.csv
 ```
 
-This reads the column headers from the contact file and writes a new
-`contacts-template.md` (named after the contact file) with:
+This writes `contacts-template.md` (named after the contact file) with:
 
 - YAML front matter (`subject`, `cc`, `bcc`) using the first two non-email
   columns as subject placeholders
 - A greeting line using the first non-email column
 - A reference list of every available `{{ placeholder }}`
 
-Edit the generated file, then pass it back with
-`--template contacts-template.md` to preview or send.
-
 The command refuses to overwrite an existing file; rename or remove it first.
+
+## Use a specific template file
+
+`--template filename.md` (with a filename) tells the script which template to
+use. The default is `email-template.md` when the flag is omitted entirely.
+
+After scaffolding, edit the generated file and then pass it back:
+
+```bash
+python mail_merge.py --template contacts-template.md --preview
+python mail_merge.py --template contacts-template.md --send
+```
+
+Combine with `--contacts` to pair a custom template with a custom contact list:
+
+```bash
+python mail_merge.py --template outreach.md --contacts outreach-list.xlsx --preview
+```
 
 ## Preview
 
-Preview without sending:
+Preview without sending (uses `email-template.md` by default):
 
 ```bash
 python mail_merge.py --preview
@@ -100,6 +115,53 @@ Use an OpenDocument spreadsheet:
 ```bash
 python mail_merge.py --contacts contact-list.ods --preview
 ```
+
+## Data quality checks
+
+Before sending (or previewing), the script validates every contact and flags:
+
+- **Duplicate email addresses** — only the first occurrence would be sent to;
+  later rows are flagged
+- **Invalid email format** — no `@`, missing domain, etc.
+- **Name fields** — checked automatically based on column names:
+  - `First Name` + `Last Name` columns: empty values, digits, or identical
+    first and last name (e.g. `John John`)
+  - `Name` column: single-word entries, digits, or repeated first/last word
+
+If issues are found, they are printed in a table and you are prompted:
+
+```text
+  1. Exit    — fix the contact file and re-run
+  2. Continue — proceed anyway (duplicate/invalid emails will be skipped)
+```
+
+Choosing **Continue** automatically drops duplicate and malformed email
+addresses; contacts with name warnings (e.g. a real name like "John John")
+are still included. In non-interactive (piped) mode the script exits by
+default.
+
+## Audit trail
+
+After every `--send` run the script writes two columns back into the contact
+file, using the run date in the column name so multiple rounds on the same
+list stay separate:
+
+| Column | Value | Example |
+| --- | --- | --- |
+| `Sent - YYYY-MM-DD` | Time the run started | `14:32` |
+| `Template - YYYY-MM-DD` | Template filename used | `outreach.md` |
+
+Only contacts that were successfully sent get a value. Contacts skipped by
+`--limit`, validation failures, or send errors are left blank, making it
+easy to filter the spreadsheet for "not yet reached" rows.
+
+A second run on the same day updates the time in the existing columns. A run
+on a different day adds a new pair of columns, preserving the full send
+history for every contact.
+
+Supported for `.xlsx` and `.xlsm` files. `.csv` files are also supported.
+`.ods` files are read correctly but write-back is not supported; a note is
+printed after sending.
 
 ## Send
 
