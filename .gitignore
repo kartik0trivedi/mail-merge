@@ -12,6 +12,8 @@ __pycache__/
 # macOS
 .DS_Store
 
+#folders
+reviews/
 # files
 *.csv
 !contact-list.csv

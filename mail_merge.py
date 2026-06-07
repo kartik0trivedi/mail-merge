@@ -24,6 +24,7 @@ load_dotenv()
 
 REQUIRED_COLUMNS = ("Email",)
 PLACEHOLDER_RE = re.compile(r"{{\s*([^{}]+?)\s*}}")
+_IF_BLOCK_RE = re.compile(r"\{%\s*if\s+([^%]+?)\s*%\}(.*?)\{%\s*endif\s*%\}", re.DOTALL)
 _DIGIT_RE = re.compile(r"\d")
 _EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
 
@@ -356,6 +357,15 @@ def parse_recipients(value: str) -> tuple[str, ...]:
 
 
 def render(text: str, contact: Contact) -> str:
+    def eval_if_block(match: re.Match[str]) -> str:
+        field_name = match.group(1).strip()
+        if field_name not in contact.fields:
+            raise ValueError(
+                f"Template uses {{% if {field_name} %}}, but contact list "
+                f"does not have a '{field_name}' column"
+            )
+        return match.group(2) if contact.fields[field_name] else ""
+
     def replace(match: re.Match[str]) -> str:
         field_name = match.group(1).strip()
         if field_name not in contact.fields:
@@ -365,7 +375,9 @@ def render(text: str, contact: Contact) -> str:
             )
         return contact.fields[field_name]
 
-    return PLACEHOLDER_RE.sub(replace, text)
+    text = _IF_BLOCK_RE.sub(eval_if_block, text)
+    rendered = PLACEHOLDER_RE.sub(replace, text)
+    return re.sub(r'\n{3,}', '\n\n', rendered)
 
 
 def preview(

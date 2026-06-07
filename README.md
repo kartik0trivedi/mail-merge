@@ -21,6 +21,26 @@ contact file as a merge field:
 
 The placeholder name must match the Excel column header exactly.
 
+## Conditional blocks
+
+Wrap any section in `{% if field %}...{% endif %}` to render it only when the
+field is non-empty. Useful for optional columns (a second abstract, a P.S. line,
+an institution name) that not every contact has:
+
+```md
+{% if Abstract-title2 %}
+**{{ Abstract-title2 }}**
+
+Reviewer's Comments:
+
+{{ Open_comments2 }}
+{% endif %}
+```
+
+The block — including all surrounding text and nested placeholders — is silently
+omitted for contacts where that field is blank. The field name must match the
+contact-list column header exactly.
+
 The Markdown template front matter supports `subject`, `cc`, and `bcc`:
 
 ```md
